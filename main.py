@@ -1,28 +1,27 @@
 from Board import *
+from Game import *
+from Node import *
 
 def main():
-    size = int(input("Enter board size: "))
-    board = Board(size=size)
-    
-    player = "A"
-    print(board)
+    print("AI is Red, You are Blue\n")
 
-    while not board.gameOver():
-        row = int(input("Row: "))
-        col = int(input("Col: "))
-        edge = str(input("Edge: "))
+    while True:
+        try:
+            row = int(input("Enter number of rows for board size: "))
+            col = int(input("Enter number of columns for board size: "))
+            plies = int(input("Enter number of plies: "))
 
-        board.addEdge(row, col, edge, True, player)
-        print(board)
+        except ValueError:
+            print("Input must be an integer")
+            continue
 
-        if player == "A": # change player
-            player = "B"
         else:
-            player = "A"
-
-        print(board.getScore())
-
-    print(board)
+            print("")
+            size = (row, col)
+            board = Board(size=size)
+            game = Game(board=board, plies=plies)
+            game.run()
+            break
 
 if __name__ == "__main__":
     main()
