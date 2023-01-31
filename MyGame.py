@@ -57,7 +57,7 @@ class Game(object):
                 player = "B"
 
             else:                       # player's turn
-                aiScore, aiMove = self.max_value(float('-inf'),float('inf'))
+                aiScore, aiMove = self.min_value(float('-inf'),float('inf'))
                 print(f"AI2 MOVED row: {aiMove[0]} col: {aiMove[1]} edge: {aiMove[2]}")
                 self.board.addEdge(aiMove[0], aiMove[1], aiMove[2], True, player)
                 player = "A"
