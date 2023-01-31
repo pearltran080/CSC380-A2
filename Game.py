@@ -1,5 +1,4 @@
 from Board import *
-from Node import *
 
 class Game(object):
     def __init__(self, board: Board, plies: int):
@@ -8,36 +7,108 @@ class Game(object):
         self.compScore = 0
         self.board = board
 
-    def minimax(self, depth: int, max: bool):
-        if depth == self.plies:
-            return
-
+    def minimax(self, depth: int, maxTurn: bool):
         score = self.board.getScore()
-
-        if (self.board.gameOver):
+        # base cases: reached target plies, game is over
+        if (depth == self.plies) or (self.board.gameOver()):
             return score
 
-        if (max):
-            # move where ever available
+        if (maxTurn):
+            bestScore = -5000
+
             for i in range(self.board.rows):
                 for j in range(self.board.cols):
                     if (not self.board.board[i][j].top.edge):
                         self.board.addEdge(i, j, "top", True, "A")
-                    elif (not self.board.board[i][j].bot.edge):
-                        self.board.addEdge(i, j, "bot", True, "A")
-                    elif (not self.board.board[i][j].left.edge):
-                        self.board.addEdge(i, j, "left", True, "A")
-                    elif (not self.board.board[i][j].right.edge):
-                        self.board.addEdge(i, j, "right", True, "A")
+                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
+                        self.board.addEdge(i, j, "top", False, "A")
 
+                    if (not self.board.board[i][j].bot.edge):
+                        self.board.addEdge(i, j, "bot", True, "A")
+                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
+                        self.board.addEdge(i, j, "bot", False, "A")
+
+                    if (not self.board.board[i][j].left.edge):
+                        self.board.addEdge(i, j, "left", True, "A")
+                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
+                        self.board.addEdge(i, j, "left", False, "A")
+
+                    if (not self.board.board[i][j].right.edge):
+                        self.board.addEdge(i, j, "right", True, "A")
+                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
+                        self.board.addEdge(i, j, "right", False, "A")
+
+            return bestScore
+        
+        else:
+            bestScore = 5000
+
+            for i in range(self.board.rows):
+                for j in range(self.board.cols):
+                    if (not self.board.board[i][j].top.edge):
+                        self.board.addEdge(i, j, "top", True, "B")
+                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
+                        self.board.addEdge(i, j, "top", False, "B")
+
+                    if (not self.board.board[i][j].bot.edge):
+                        self.board.addEdge(i, j, "bot", True, "B")
+                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
+                        self.board.addEdge(i, j, "bot", False, "B")
+
+                    if (not self.board.board[i][j].left.edge):
+                        self.board.addEdge(i, j, "left", True, "B")
+                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
+                        self.board.addEdge(i, j, "left", False, "B")
+
+                    if (not self.board.board[i][j].right.edge):
+                        self.board.addEdge(i, j, "right", True, "B")
+                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
+                        self.board.addEdge(i, j, "right", False, "B")
+
+            return bestScore
 
     def moveAI(self):
-        # if currDepth == self.plies:
-        #     return
-        return [0, 0, "right"]
+        bestScore = -5000
+        move = [-1, -1, ""]
+
+        for i in range(self.board.rows):
+            for j in range(self.board.cols):
+                if (not self.board.board[i][j].top.edge):
+                    self.board.addEdge(i, j, "top", True, "A")
+                    moveScore = self.minimax(depth=0, maxTurn=False)
+                    self.board.addEdge(i, j, "top", False, "A")
+                    if (moveScore > bestScore):
+                        bestScore = moveScore
+                        move = [i, j, "top"]
+
+                if (not self.board.board[i][j].bot.edge):
+                    self.board.addEdge(i, j, "bot", True, "A")
+                    moveScore = self.minimax(depth=0, maxTurn=False)
+                    self.board.addEdge(i, j, "bot", False, "A")
+                    if (moveScore > bestScore):
+                        bestScore = moveScore
+                        move = [i, j, "bot"]
+
+                if (not self.board.board[i][j].left.edge):
+                    self.board.addEdge(i, j, "left", True, "A")
+                    moveScore = self.minimax(depth=0, maxTurn=False)
+                    self.board.addEdge(i, j, "left", False, "A")
+                    if (moveScore > bestScore):
+                        bestScore = moveScore
+                        move = [i, j, "left"]
+
+                if (not self.board.board[i][j].right.edge):
+                    self.board.addEdge(i, j, "right", True, "A")
+                    moveScore = self.minimax(depth=0, maxTurn=False)
+                    self.board.addEdge(i, j, "right", False, "A")
+                    if (moveScore > bestScore):
+                        bestScore = moveScore
+                        move = [i, j, "right"]
+        
+        return move
 
     def run(self):
-        player = "A"
+        player = "B"
 
         while not self.board.gameOver():
             if (player == "A"):           # AI's turn
@@ -77,7 +148,7 @@ class Game(object):
                         elif (edge == "right" and not self.board.board[row][col].right.edge):
                             pass
                         else:
-                            print(edge + " edge is already placed here, try again")
+                            print(edge + " is either already placed or is not an edge name. try again")
                             continue
 
                         # place edge for player

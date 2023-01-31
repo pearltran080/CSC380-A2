@@ -1,6 +1,5 @@
 from Board import *
 from Game import *
-from Node import *
 
 def main():
     print("AI is Red, You are Blue\n")
