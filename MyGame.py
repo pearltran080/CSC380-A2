@@ -57,11 +57,11 @@ class Game(object):
                 player = "B"
 
             else:                       # player's turn
-                aiScore, aiMove = self.min_value(float('-inf'),float('inf'))
-                print(f"AI2 MOVED row: {aiMove[0]} col: {aiMove[1]} edge: {aiMove[2]}")
-                self.board.addEdge(aiMove[0], aiMove[1], aiMove[2], True, player)
-                player = "A"
-                '''
+                # aiScore, aiMove = self.min_value(float('-inf'),float('inf'))
+                # print(f"AI2 MOVED row: {aiMove[0]} col: {aiMove[1]} edge: {aiMove[2]}")
+                # self.board.addEdge(aiMove[0], aiMove[1], aiMove[2], True, player)
+                # player = "A"
+                
                 print("YOUR TURN")
                 while True:
                     try:
@@ -100,7 +100,7 @@ class Game(object):
                         print("YOUR MOVE")
                         player = "A"
                         break
-                    '''
+                    
 
             print(self.board)
             print("AI1 Score: {}, AI2 Score: {}".format(self.board.getPlayerScore("A"), self.board.getPlayerScore("B")))
