@@ -1,5 +1,5 @@
 from Board import *
-from Game import *
+from MyGame import *
 
 def main():
     print("AI is Red, You are Blue\n")
@@ -19,7 +19,7 @@ def main():
             size = (row, col)
             board = Board(size=size)
             game = Game(board=board, plies=plies)
-            game.run()
+            game.minmax_search()
             break
 
 if __name__ == "__main__":

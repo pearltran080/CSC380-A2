@@ -41,7 +41,7 @@ class Box(object):
         self.owner = None
 
 class Board(object):
-    def __init__(self, size: tuple()):
+    def __init__(self, size: tuple):
         self.rows = size[0]
         self.cols = size[1]
         self.board = []
@@ -127,6 +127,40 @@ class Board(object):
                 if (self.board[i][j].owner == player):
                     score += self.board[i][j].value
         return score
+
+    def copyBoard(self):
+        copy = Board((self.rows,self.cols))
+        for i in range(self.rows):
+            for j in range(self.cols):
+                copy.board[i][j].value = self.board[i][j].value 
+                copy.board[i][j].top.edge = self.board[i][j].top.edge 
+                copy.board[i][j].bot.edge = self.board[i][j].bot.edge 
+                copy.board[i][j].left.edge = self.board[i][j].left.edge 
+                copy.board[i][j].right.edge = self.board[i][j].right.edge 
+                copy.board[i][j].owner = self.board[i][j].owner 
+        return copy
+
+    def actions(self):
+        available_moves = []
+        for i in range(self.rows):
+            for j in range(self.cols):      # print top horizontal edges
+                if (not self.board[i][j].top.edge):
+                    available_moves.append((i,j,'top'))
+
+            for j in range(self.cols):      # print vertical edges and numbers
+                if (not self.board[i][j].left.edge):
+                    available_moves.append((i,j,'left'))
+
+                if (j == self.cols-1):
+                    if (not self.board[i][j].right.edge):
+                        available_moves.append((i,j,'right'))
+                        
+            if (i == self.rows-1):          # print bottom horizontal edges
+                for j in range(self.cols):
+                    if (not self.board[i][j].bot.edge):
+                        available_moves.append((i,j,'bot'))
+
+        return available_moves
 
     def __repr__(self):
         return str(self)
