@@ -7,112 +7,54 @@ class Game(object):
         self.compScore = 0
         self.board = board
 
-    def minimax(self, depth: int, maxTurn: bool):
-        score = self.board.getScore()
-        # base cases: reached target plies, game is over
-        if (depth == self.plies) or (self.board.gameOver()):
-            return score
-
-        if (maxTurn):
-            bestScore = -5000
-
-            for i in range(self.board.rows):
-                for j in range(self.board.cols):
-                    if (not self.board.board[i][j].top.edge):
-                        self.board.addEdge(i, j, "top", True, "A")
-                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
-                        self.board.addEdge(i, j, "top", False, "A")
-
-                    if (not self.board.board[i][j].bot.edge):
-                        self.board.addEdge(i, j, "bot", True, "A")
-                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
-                        self.board.addEdge(i, j, "bot", False, "A")
-
-                    if (not self.board.board[i][j].left.edge):
-                        self.board.addEdge(i, j, "left", True, "A")
-                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
-                        self.board.addEdge(i, j, "left", False, "A")
-
-                    if (not self.board.board[i][j].right.edge):
-                        self.board.addEdge(i, j, "right", True, "A")
-                        bestScore = max(bestScore, self.minimax(depth=depth + 1, maxTurn=False))
-                        self.board.addEdge(i, j, "right", False, "A")
-
-            return bestScore
+    def max_value(self):
+        if (self.plies == 0) or (self.board.gameOver()):
+            return (self.board.getScore(), None)
         
-        else:
-            bestScore = 5000
+        maxVal = -5000
+        maxMove = None
 
-            for i in range(self.board.rows):
-                for j in range(self.board.cols):
-                    if (not self.board.board[i][j].top.edge):
-                        self.board.addEdge(i, j, "top", True, "B")
-                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
-                        self.board.addEdge(i, j, "top", False, "B")
+        for i, j, edge in self.board.expand():
+            tempBoard = self.board.getBoardCopy()
+            tempBoard.addEdge(i, j, edge, True, "A")
+            nextState = Game(tempBoard, self.plies - 1)
+            value, _ = nextState.min_value()
 
-                    if (not self.board.board[i][j].bot.edge):
-                        self.board.addEdge(i, j, "bot", True, "B")
-                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
-                        self.board.addEdge(i, j, "bot", False, "B")
-
-                    if (not self.board.board[i][j].left.edge):
-                        self.board.addEdge(i, j, "left", True, "B")
-                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
-                        self.board.addEdge(i, j, "left", False, "B")
-
-                    if (not self.board.board[i][j].right.edge):
-                        self.board.addEdge(i, j, "right", True, "B")
-                        bestScore = min(bestScore, self.minimax(depth=depth + 1, maxTurn=True))
-                        self.board.addEdge(i, j, "right", False, "B")
-
-            return bestScore
-
-    def moveAI(self):
-        bestScore = -5000
-        move = [-1, -1, ""]
-
-        for i in range(self.board.rows):
-            for j in range(self.board.cols):
-                if (not self.board.board[i][j].top.edge):
-                    self.board.addEdge(i, j, "top", True, "A")
-                    moveScore = self.minimax(depth=0, maxTurn=False)
-                    self.board.addEdge(i, j, "top", False, "A")
-                    if (moveScore > bestScore):
-                        bestScore = moveScore
-                        move = [i, j, "top"]
-
-                if (not self.board.board[i][j].bot.edge):
-                    self.board.addEdge(i, j, "bot", True, "A")
-                    moveScore = self.minimax(depth=0, maxTurn=False)
-                    self.board.addEdge(i, j, "bot", False, "A")
-                    if (moveScore > bestScore):
-                        bestScore = moveScore
-                        move = [i, j, "bot"]
-
-                if (not self.board.board[i][j].left.edge):
-                    self.board.addEdge(i, j, "left", True, "A")
-                    moveScore = self.minimax(depth=0, maxTurn=False)
-                    self.board.addEdge(i, j, "left", False, "A")
-                    if (moveScore > bestScore):
-                        bestScore = moveScore
-                        move = [i, j, "left"]
-
-                if (not self.board.board[i][j].right.edge):
-                    self.board.addEdge(i, j, "right", True, "A")
-                    moveScore = self.minimax(depth=0, maxTurn=False)
-                    self.board.addEdge(i, j, "right", False, "A")
-                    if (moveScore > bestScore):
-                        bestScore = moveScore
-                        move = [i, j, "right"]
+            if maxVal < value:
+                maxVal = value
+                maxMove = (i, j, edge)
         
+        return maxVal, maxMove  # maxMove = move to get to the state with maxVal
+
+    def min_value(self):
+        if (self.plies == 0) or (self.board.gameOver()):
+            return (self.board.getScore(), None)
+
+        minVal = 5000
+        minMove = None
+
+        for i, j, edge in self.board.expand():
+            tempBoard = self.board.getBoardCopy()
+            tempBoard.addEdge(i, j, edge, True, "B")
+            nextState = Game(tempBoard, self.plies - 1)
+            value, _ = nextState.max_value()
+
+            if minVal > value:
+                minVal = value
+                minMove = (i, j, edge)
+        
+        return minVal, minMove  # minMove = move to get to the state with minVal
+
+    def minimax(self):
+        value, move = self.max_value()
         return move
 
     def run(self):
-        player = "B"
+        player = "A"
 
         while not self.board.gameOver():
-            if (player == "A"):           # AI's turn
-                aiMove = self.moveAI()
+            if (player == "A"):         # AI's turn
+                aiMove = self.minimax()
                 print("AI MOVED row: {} col: {} edge: {}".format(aiMove[0], aiMove[1], aiMove[2]))
                 self.board.addEdge(aiMove[0], aiMove[1], aiMove[2], True, player)
                 player = "B"
@@ -160,3 +102,4 @@ class Game(object):
             print(self.board)
             print("AI Score: {}, Your Score: {}".format(self.board.getPlayerScore("A"), self.board.getPlayerScore("B")))
             print("")
+        print("GAME OVER")

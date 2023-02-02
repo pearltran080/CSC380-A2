@@ -46,6 +46,7 @@ class Board(object):
         self.cols = size[1]
         self.board = []
 
+        # empty board with randomly generated values
         for i in range(self.rows):
 
             row = []
@@ -120,6 +121,7 @@ class Board(object):
                     return False
         return True
 
+    # returns individual player score
     def getPlayerScore(self, player: str):
         score = 0
         for i in range(self.rows):
@@ -127,6 +129,45 @@ class Board(object):
                 if (self.board[i][j].owner == player):
                     score += self.board[i][j].value
         return score
+    
+    # find next available actions, no repeated edges
+    def expand(self):
+        expandLst = []
+
+        for i in range(self.rows):
+            for j in range(self.cols):      # expand top horizontal edges
+                if (not self.board[i][j].top.edge):
+                    expandLst.append((i, j, "top"))
+
+            for j in range(self.cols):      # expand vertical edges
+                if (not self.board[i][j].left.edge):
+                    expandLst.append((i, j, "left"))
+
+                if (j == self.cols-1):
+                    if (not self.board[i][j].right.edge):
+                        expandLst.append((i, j, "right"))
+
+            if (i == self.rows-1):          # expand bottom horizontal edges
+                for j in range(self.cols):
+                    if (not self.board[i][j].bot.edge):
+                        expandLst.append((i, j, "bot"))
+        
+        return expandLst
+
+    # create a temp board to generate potential moves from
+    def getBoardCopy(self):
+        copied = Board((self.rows, self.cols))
+
+        for i in range(self.rows):
+            for j in range (self.cols):
+                copied.board[i][j].top.edge = self.board[i][j].top.edge
+                copied.board[i][j].bot.edge = self.board[i][j].bot.edge
+                copied.board[i][j].left.edge = self.board[i][j].left.edge
+                copied.board[i][j].right.edge = self.board[i][j].right.edge
+                copied.board[i][j].value = self.board[i][j].value
+                copied.board[i][j].owner = self.board[i][j].owner
+
+        return copied
 
     def __repr__(self):
         return str(self)
