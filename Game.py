@@ -3,8 +3,6 @@ from Board import *
 class Game(object):
     def __init__(self, board: Board, plies: int):
         self.plies = plies
-        self.playerScore = 0
-        self.compScore = 0
         self.board = board
 
     def max_value(self):
